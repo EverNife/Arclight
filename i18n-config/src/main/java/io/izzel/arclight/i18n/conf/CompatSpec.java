@@ -19,6 +19,9 @@ public class CompatSpec {
     @Setting("symlink-world")
     private boolean symlinkWorld;
 
+    @Setting("normalized-world-names")
+    private boolean normalizedWorldNames;
+
     public Map<String, MaterialPropertySpec> getMaterials() {
         return materials;
     }
@@ -37,5 +40,9 @@ public class CompatSpec {
 
     public boolean isSymlinkWorld() {
         return symlinkWorld;
+    }
+
+    public boolean isNormalizedWorldNames() {
+        return normalizedWorldNames;
     }
 }

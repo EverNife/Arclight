@@ -7,6 +7,7 @@ import com.mojang.datafixers.DataFixer;
 import io.izzel.arclight.common.bridge.command.ICommandSourceBridge;
 import io.izzel.arclight.common.bridge.server.MinecraftServerBridge;
 import io.izzel.arclight.common.bridge.world.WorldBridge;
+import io.izzel.arclight.common.bridge.world.storage.DerivedWorldInfoBridge;
 import io.izzel.arclight.common.mod.ArclightConstants;
 import io.izzel.arclight.common.mod.server.BukkitRegistry;
 import io.izzel.arclight.common.mod.util.ArclightCaptures;
@@ -38,20 +39,22 @@ import net.minecraft.util.datafix.codec.DatapackCodec;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.registry.DynamicRegistries;
+import net.minecraft.util.registry.SimpleRegistry;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.Dimension;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.ForcedChunksSaveData;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.chunk.listener.IChunkStatusListener;
 import net.minecraft.world.chunk.listener.IChunkStatusListenerFactory;
+import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.feature.template.TemplateManager;
 import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
 import net.minecraft.world.server.ServerChunkProvider;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.server.TicketType;
-import net.minecraft.world.storage.IServerConfiguration;
-import net.minecraft.world.storage.IServerWorldInfo;
-import net.minecraft.world.storage.SaveFormat;
+import net.minecraft.world.storage.*;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.world.StructureSpawnManager;
 import net.minecraftforge.fml.BrandingControl;
@@ -85,11 +88,7 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.Proxy;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.BooleanSupplier;
@@ -337,6 +336,12 @@ public abstract class MinecraftServerMixin extends RecursiveEventLoop<TickDelaye
     @Inject(method = "func_240787_a_", at = @At(value = "NEW", ordinal = 0, target = "net/minecraft/world/server/ServerWorld"))
     private void arclight$registerEnv(IChunkStatusListener p_240787_1_, CallbackInfo ci) {
         BukkitRegistry.registerEnvironments();
+    }
+
+    @Inject(method = "func_240787_a_", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", ordinal = 1, target = "Lnet/minecraft/world/server/ServerWorld;<init>(Lnet/minecraft/server/MinecraftServer;Ljava/util/concurrent/Executor;Lnet/minecraft/world/storage/SaveFormat$LevelSave;Lnet/minecraft/world/storage/IServerWorldInfo;Lnet/minecraft/util/RegistryKey;Lnet/minecraft/world/DimensionType;Lnet/minecraft/world/chunk/listener/IChunkStatusListener;Lnet/minecraft/world/gen/ChunkGenerator;ZJLjava/util/List;Z)V"))
+    private void arclight$setDimKey(IChunkStatusListener p_240787_1_, CallbackInfo ci, IServerWorldInfo iserverworldinfo, DimensionGeneratorSettings dimensionGeneratorSettings, boolean flag, long i, long j, List list, SimpleRegistry simpleregistry, Dimension dimension, ChunkGenerator chunkgenerator, DimensionType dimensiontype, ServerWorld serverworld, DimensionSavedDataManager dimensionsaveddatamanager, WorldBorder worldborder, Iterator var17, Map.Entry entry, RegistryKey registrykey, RegistryKey registrykey1, DimensionType dimensiontype1, ChunkGenerator chunkgenerator1, DerivedWorldInfo derivedworldinfo) {
+        DerivedWorldInfoBridge bridge = (DerivedWorldInfoBridge) derivedworldinfo;
+        bridge.bridge$setDimKey(registrykey1.getLocation());
     }
 
     @Redirect(method = "func_240787_a_", at = @At(value = "INVOKE", remap = false, target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"))
